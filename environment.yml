@@ -17,6 +17,9 @@ dependencies:
   - pandera=0.21.0
   - conda-lock=2.5.7
   - mamba=1.5.11
+  - quarto=1.5.57
+  - click=8.1.7
+  - tabulate=0.9.0
   - pip=24.3
   - pip:
     - altair_ally==0.1.1
