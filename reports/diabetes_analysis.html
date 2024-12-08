@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Inder Khera, Jenny Zhang, Jessica Kuo, Javier Martinez (alphabetically ordered)">
+<meta name="dcterms.date" content="2023-12-08">
+
+<title>Predicting Diabetes in Pima Indian Women Using Logistic Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="diabetes_analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="diabetes_analysis_files/libs/quarto-html/quarto.js"></script>
+<script src="diabetes_analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="diabetes_analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="diabetes_analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="diabetes_analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="diabetes_analysis_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="diabetes_analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="diabetes_analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="diabetes_analysis_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#summary" id="toc-summary" class="nav-link active" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#methods-and-results" id="toc-methods-and-results" class="nav-link" data-scroll-target="#methods-and-results">Methods and Results</a>
+  <ul class="collapse">
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../diabetes_analysis.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Predicting Diabetes in Pima Indian Women Using Logistic Regression</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Inder Khera, Jenny Zhang, Jessica Kuo, Javier Martinez (alphabetically ordered) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 8, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="summary" class="level1">
+<h1>Summary</h1>
+<p>This study evaluated logistic regression for predicting diabetes in Pima Indian women using features such as glucose levels, BMI, and pregnancies. The model achieved 75% accuracy on the test set, outperforming the baseline dummy classifier’s 66%. Glucose was the most significant predictor, followed by BMI and pregnancies, while blood pressure and insulin had weaker impacts. The model misclassified 54 cases, with 41 false negatives and 13 false positives, highlighting areas for improvement.</p>
+<p>The results indicate that logistic regression is a promising tool for diabetes screening, providing an efficient way to identify potential cases. However, the high number of false negatives is concerning, as they could lead to delayed diagnoses and treatments. Future improvements could include feature engineering to address misclassifications, testing alternative machine learning models, and incorporating additional data, such as lifestyle or genetic factors. Adding probability estimates for predictions could also enhance its clinical usability by helping prioritize further diagnostic tests. These steps could make the model more reliable and practical for real-world healthcare applications.</p>
+</section>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Diabetes is a serious chronic disease characterized by high levels of glucose in the blood, caused by either insufficient insulin production by the pancreas or the body’s inability to effectively use insulin. It has become a significant global health issue, with its prevalence nearly doubling since 1980, and in 2022, 14% of adults aged 18 and older were diagnosed with diabetes, doubling from 7% in 1990 <span class="citation" data-cites="who_diabetes">(<a href="#ref-who_diabetes" role="doc-biblioref">World Health Organization n.d.</a>)</span>. Diabetes can lead to severe complications, including blindness, kidney failure, heart attacks, strokes, and lower limb amputations. Early detection enables timely interventions, reduces complications, lowers healthcare costs, and improves quality of life and long-term outcomes <span class="citation" data-cites="marshall2006prevention">(<a href="#ref-marshall2006prevention" role="doc-biblioref">Marshall and Flyvbjerg 2006</a>)</span>.</p>
+<p>Artificial intelligence (AI) leverages computer systems and big data to simulate intelligent behavior with minimal human intervention, and within it, machine learning (ML) is a subset of AI methodologies. Since the rise of AI, Machine learning has increasingly been applied in various areas of disease detection and prevention in the healthcare field <span class="citation" data-cites="bini2018artificial">(<a href="#ref-bini2018artificial" role="doc-biblioref">Bini 2018</a>)</span>. Numerous machine learning techniques have been deployed to develop more efficient and effective methods for diagnosing chronic diseases <span class="citation" data-cites="battineni2020applications">(<a href="#ref-battineni2020applications" role="doc-biblioref">Battineni et al. 2020</a>)</span>. Utilizing machine learning methods in diabetes research has been proven to be a critical strategy or harnessing large volumes of diabetes-related data to extract valuable insights <span class="citation" data-cites="agarwal2022machine">(<a href="#ref-agarwal2022machine" role="doc-biblioref">Agarwal and Vadiwala 2022</a>)</span>. Therefore, The goal of this report is to leverage a supervised machine learning model, logistic regression (LR), to evaluate its predictive performance in diagnosing diabetes using a real-world dataset focused specifically on Pima Indian women aged 21 and older.</p>
+</section>
+<section id="methods-and-results" class="level1">
+<h1>Methods and Results</h1>
+<section id="data" class="level3">
+<h3 class="anchored" data-anchor-id="data">Data</h3>
+<p>The dataset that was used for the analysis of this project was created by Jack W Smith, JE Everhart, WC Dickson, WC Knowler, RS Johannes and sourced from the National Librabry of Medicine database from the National Institues of Health. Access to their respective analysis can be found <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2245318/">here</a> and access to the dataset can be found via <a href="https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database/data">kaggle</a> <span class="citation" data-cites="dua2017pima">(<a href="#ref-dua2017pima" role="doc-biblioref">Dua and Graff 2017</a>)</span>. The primary objective of the dataset is to enable diagnostic prediction of whether a patient has diabetes based on specific diagnostic measurements. To ensure consistency and relevance, several constraints were applied to the selection of data instances. Specifically, the dataset includes only female patients who are at least 21 years old and of Pima Indian heritage.</p>
+<p>Each row/obersvation from the dataset is an individual that identifies to be a part of the Pima (also known as The Akimel O’odham) Indeginous group, located mainly in the Central and Southern regions of the United States. Each observation recorded has summary statistics regarding features that include the Age, BMI, Blood Pressure, Number of Pregnancies, as well as The Diabetes Pedigree Function (which is a score that gives an idea about how much correlation is between person with diabetes and their family history). The dataset offers comprehensive features for machine learning analysis.</p>
+</section>
+<section id="analysis" class="level3">
+<h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
+<p>Logistic Regression was employed to develop a classification model for predicting whether the patient is diabetic or not (as indicated in the <code>outcome</code> column of the dataset). All variables from the original dataset were used to train the model. The data was split into 70% for the training set and 30% for the testing set. Hyperparameter tuning was performed using <code>RandomizedSearchCV</code>, with the accuracy score serving as the classification metric. All variables were standardized just before model fitting. The analysis was conducted using the Python programming language <span class="citation" data-cites="Python">(<a href="#ref-Python" role="doc-biblioref">Van Rossum and Drake 2009</a>)</span> and several Python packages: numpy <span class="citation" data-cites="harris2020array">(<a href="#ref-harris2020array" role="doc-biblioref">Harris et al. 2020</a>)</span>, Pandas <span class="citation" data-cites="pandas">(<a href="#ref-pandas" role="doc-biblioref">McKinney 2010</a>)</span>, altair <span class="citation" data-cites="altair">(<a href="#ref-altair" role="doc-biblioref">VanderPlas 2018</a>)</span>, altair_ally <span class="citation" data-cites="ostblom2021altair">(<a href="#ref-ostblom2021altair" role="doc-biblioref">Ostblom 2021</a>)</span> and scikit-learn <span class="citation" data-cites="pedregosa2011scikit">(<a href="#ref-pedregosa2011scikit" role="doc-biblioref">Pedregosa et al. 2011</a>)</span>. The code used for this analysis and report is available at: https://github.com/UBC-MDS/diabetes_predictor_py</p>
+<div id="52e6496e" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Pregnancies</th>
+<th data-quarto-table-cell-role="th">Glucose</th>
+<th data-quarto-table-cell-role="th">BloodPressure</th>
+<th data-quarto-table-cell-role="th">SkinThickness</th>
+<th data-quarto-table-cell-role="th">Insulin</th>
+<th data-quarto-table-cell-role="th">BMI</th>
+<th data-quarto-table-cell-role="th">DiabetesPedigreeFunction</th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>6</td>
+<td>148</td>
+<td>72</td>
+<td>35</td>
+<td>0</td>
+<td>33.6</td>
+<td>0.627</td>
+<td>50</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>85</td>
+<td>66</td>
+<td>29</td>
+<td>0</td>
+<td>26.6</td>
+<td>0.351</td>
+<td>31</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>8</td>
+<td>183</td>
+<td>64</td>
+<td>0</td>
+<td>0</td>
+<td>23.3</td>
+<td>0.672</td>
+<td>32</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1</td>
+<td>89</td>
+<td>66</td>
+<td>23</td>
+<td>94</td>
+<td>28.1</td>
+<td>0.167</td>
+<td>21</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0</td>
+<td>137</td>
+<td>40</td>
+<td>35</td>
+<td>168</td>
+<td>43.1</td>
+<td>2.288</td>
+<td>33</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">763</td>
+<td>10</td>
+<td>101</td>
+<td>76</td>
+<td>48</td>
+<td>180</td>
+<td>32.9</td>
+<td>0.171</td>
+<td>63</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">764</td>
+<td>2</td>
+<td>122</td>
+<td>70</td>
+<td>27</td>
+<td>0</td>
+<td>36.8</td>
+<td>0.340</td>
+<td>27</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">765</td>
+<td>5</td>
+<td>121</td>
+<td>72</td>
+<td>23</td>
+<td>112</td>
+<td>26.2</td>
+<td>0.245</td>
+<td>30</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">766</td>
+<td>1</td>
+<td>126</td>
+<td>60</td>
+<td>0</td>
+<td>0</td>
+<td>30.1</td>
+<td>0.349</td>
+<td>47</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">767</td>
+<td>1</td>
+<td>93</td>
+<td>70</td>
+<td>31</td>
+<td>0</td>
+<td>30.4</td>
+<td>0.315</td>
+<td>23</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+<p>768 rows × 9 columns</p>
+</div>
+</div>
+</div>
+<div id="9b7e56cd" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-stdout">
+<pre><code>(768, 9)
+(719, 9)</code></pre>
+</div>
+</div>
+<p>We do see 49 observations being dropped post our preliminary data validation as the rows dropped contain meaningless and / or invalid data entries that would unlikely provide useful information but instead introduce noise or spurious relationships into our model. Details of the observations dropped can be found at https://github.com/UBC-MDS/diabetes_predictor_py under <code>validation_errors.log</code>. It is clearly shown from the log that majority of data points that are dropped contained values of 0 where levels cannot possibly be, hence, we suspect that the values recorded at 0 are likely missing values recorded in such way, a critical point we will confirm with data collectors if we have access.</p>
+<div id="60432c00" class="cell" data-execution_count="7">
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 719 entries, 0 to 718
+Data columns (total 9 columns):
+ #   Column                    Non-Null Count  Dtype  
+---  ------                    --------------  -----  
+ 0   Pregnancies               719 non-null    int64  
+ 1   Glucose                   719 non-null    int64  
+ 2   BloodPressure             719 non-null    int64  
+ 3   SkinThickness             719 non-null    int64  
+ 4   Insulin                   719 non-null    int64  
+ 5   BMI                       719 non-null    float64
+ 6   DiabetesPedigreeFunction  719 non-null    float64
+ 7   Age                       719 non-null    int64  
+ 8   Outcome                   719 non-null    int64  
+dtypes: float64(2), int64(7)
+memory usage: 50.7 KB</code></pre>
+</div>
+</div>
+<div id="d1ba27cb" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Pregnancies</th>
+<th data-quarto-table-cell-role="th">Glucose</th>
+<th data-quarto-table-cell-role="th">BloodPressure</th>
+<th data-quarto-table-cell-role="th">SkinThickness</th>
+<th data-quarto-table-cell-role="th">Insulin</th>
+<th data-quarto-table-cell-role="th">BMI</th>
+<th data-quarto-table-cell-role="th">DiabetesPedigreeFunction</th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>503.000000</td>
+<td>503.000000</td>
+<td>503.000000</td>
+<td>503.000000</td>
+<td>503.000000</td>
+<td>503.000000</td>
+<td>503.000000</td>
+<td>503.000000</td>
+<td>503.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>3.813121</td>
+<td>121.524851</td>
+<td>73.025845</td>
+<td>21.045726</td>
+<td>81.982107</td>
+<td>31.940954</td>
+<td>0.482628</td>
+<td>33.087475</td>
+<td>0.328032</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>3.360905</td>
+<td>30.469809</td>
+<td>12.250267</td>
+<td>15.366826</td>
+<td>113.203347</td>
+<td>7.218791</td>
+<td>0.349740</td>
+<td>11.842942</td>
+<td>0.469964</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>0.000000</td>
+<td>56.000000</td>
+<td>40.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.085000</td>
+<td>21.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>1.000000</td>
+<td>99.500000</td>
+<td>64.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>26.800000</td>
+<td>0.246500</td>
+<td>24.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>3.000000</td>
+<td>117.000000</td>
+<td>72.000000</td>
+<td>23.000000</td>
+<td>44.000000</td>
+<td>31.600000</td>
+<td>0.381000</td>
+<td>29.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>6.000000</td>
+<td>139.000000</td>
+<td>80.000000</td>
+<td>32.000000</td>
+<td>130.000000</td>
+<td>36.450000</td>
+<td>0.646500</td>
+<td>41.000000</td>
+<td>1.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>14.000000</td>
+<td>199.000000</td>
+<td>122.000000</td>
+<td>63.000000</td>
+<td>744.000000</td>
+<td>59.400000</td>
+<td>2.420000</td>
+<td>81.000000</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="1573a125" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>['Pregnancies',
+ 'Glucose',
+ 'BloodPressure',
+ 'SkinThickness',
+ 'Insulin',
+ 'BMI',
+ 'DiabetesPedigreeFunction',
+ 'Age',
+ 'Outcome']</code></pre>
+</div>
+</div>
+<div id="fig-feature_histograms" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-feature_histograms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/figures/feature_histograms.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-feature_histograms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Comparison of the empirical distributions of training data predictors between those non-diabetic and diabetic.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-feature_histograms" class="quarto-xref">Figure&nbsp;1</a> above illustrates the distribution of each feature, categorized based on the Outcome variable: 0 (Non-Diabetic) and 1 (Diabetic). This visualization provides insights into the relationships between individual features and the target variable.</p>
+<p>For the <code>Glucose</code> levels, Non-Diabetic class exhibits a roughly normal distribution, whereas the Diabetic class shows a pronounced shift toward the middle-to-higher range of glucose levels.</p>
+<p>The <code>BMI</code> distribution resembles a normal distribution but skews slightly toward higher values. Similar to Glucose levels, the Diabetic class displays a decent shit towards the middle-to-higher ranges when compared to Non-Diabetic class, suggesting the potential for distinct differences between target groups within this category.</p>
+<p>The <code>Age</code> distribution reveals that individuals aged 20 to 32 are predominantly Non-Diabetic. Beyond age 32, the counts of Diabetic and Non-Diabetic individuals become comparable, with some bins showing a higher count for the Diabetic class, despite fewer overall observations in this group. The Non-Diabetic class leans toward younger ages, while the Diabetic class has a more even distribution across its age range.</p>
+<p>For <code>Pregnancies</code>, <code>Insulin</code>, and <code>DiabetesPedigreeFunction</code> -genetic risk of diabetes based on family history ranging from 0 to 2.5, the lower range of pregnancies is dominated by the Non-Diabetic class, whereas whereas higher numbers are more common in the Diabetic class.</p>
+<p>For <code>Blood Pressure</code> and <code>Skin Thickness</code>, both the Diabetic and Non-Diabetic classes approximates a normal distribution; however, the Non-Diabetic distribution skews slightly towards lower values, while the Diabetic class skews more towards higher values.</p>
+<div id="fig-correlation_heat_map" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-correlation_heat_map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/figures/correlation_heat_map.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-correlation_heat_map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Pearson and Spearman correlations across all features.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-correlation_heat_map" class="quarto-xref">Figure&nbsp;2</a> shows the correlation between all of the respective features. The main reasoning to analyze this is to see if there is any multicollinearity between any of the features which could be problematic when conducting a Logistic Regression. We see that highest level of correlation is between Age and Pregnancies (1 via Spearman, and 1 by Pearson). Since this is below the threshold of 0.7, we can conclude that all features’ coefficients are suitable and will not cause any multicollinearity in our model.</p>
+<div id="fig-pairwise_scatterplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pairwise_scatterplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/figures/pairwise_scatterplot.png" class="img-fluid figure-img" style="width:120.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pairwise_scatterplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Pairwise scatterplots between each of features in dataset to visualize relationship.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-pairwise_scatterplot" class="quarto-xref">Figure&nbsp;3</a> illustrates the relationships between the features. For the most part, the features do not display noticeable trends. However, Skin Thickness and BMI show a moderate visual relationship, which is intuitive since higher body mass is generally associated with increased skin thickness.</p>
+<p>Referring back to the correlation graph, Skin Thickness and BMI have a Spearman correlation of 0. This value is below the multicollinearity threshold of 0.7, indicating that these features do not pose a risk of multicollinearity in our model.</p>
+<p>We then further split our dataset into X and y for both the training and test.</p>
+<p>As a result, the Dummy Classifier acts as our baseline for conducting our initial analysis. The Dummy Baseline gives us a score of around 0.66.</p>
+<p>We will use a Logistic Regression model for classification. Given the presence of outliers in our features, it is advisable to apply StandardScaler() to normalize the feature values before fitting the model. This ensures that all features are on a similar scale, improving the model’s performance and stability. We optimize the hyperparameter <code>C</code> for our Logistic Regression model using a random search approach and have identified C = <code>python {random_search.best_params_}</code> as the optimal C to be used in our Logistic Regression model.</p>
+<div class="cell" data-execution_count="11">
+<div id="tbl-coeff_table" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="11">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-coeff_table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Logistic regression feature importance measured by coefficients.
+</figcaption>
+<div aria-describedby="tbl-coeff_table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="29">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Features</th>
+<th style="text-align: right;">Coefficients</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Glucose</td>
+<td style="text-align: right;">0.723708</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BMI</td>
+<td style="text-align: right;">0.3887</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pregnancies</td>
+<td style="text-align: right;">0.228731</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Age</td>
+<td style="text-align: right;">0.194047</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DiabetesPedigreeFunction</td>
+<td style="text-align: right;">0.160928</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BloodPressure</td>
+<td style="text-align: right;">0.0480461</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Insulin</td>
+<td style="text-align: right;">0.00196834</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SkinThickness</td>
+<td style="text-align: right;">-0.00650682</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Having determined the best Logistic Regression model for our analysis, we further explore feature importance with coefficients. Based on the heatmap and <a href="#tbl-coeff_table" class="quarto-xref">Table&nbsp;1</a> above, the feature importance coefficients for the logistic regression model predicting diabetes reveal that <code>Glucose</code> (0.72) is the strongest positive influence, followed by <code>BMI</code> (0.39), <code>Pregnancies</code> (0.23), <code>Age</code> (0.19), and <code>DiabetesPedigreeFunction</code> (0.16). The negative influence <code>SkinThickness</code> (-0.01) along with the remaining positive features <code>BloodPressure</code> (0.05) and <code>Insulin</code> (0.0), have weak impacts on the prediction, with their effects being less pronounced.</p>
+<p>We then evaluate the best Logistic Regression model, obtained from the hyperparameter search, on the test set. In addition, to enhance the model’s practical use in a clinical setting, we are providing and reporting probability estimates for the predictions of diabetes. Offering probability estimates would allow clinicians to gauge the model’s confidence in its predictions. This would give clinicians the opportunity to conduct additional diagnostic tests if the predicted probability for the outcome (i.e.&nbsp;diagnosis of prediction) is not sufficiently high.</p>
+<div class="cell" data-execution_count="12">
+<div id="pred_results_1_table" class="cell-output cell-output-display cell-output-markdown" data-execution_count="30">
+<table class="caption-top table table-sm table-striped small">
+<caption>Prediction Results with Probability Estimates for Diabetes Classification. {#cell-pred_results_1_table}</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">y_test</th>
+<th style="text-align: right;">y_pred</th>
+<th style="text-align: left;">pred_bool</th>
+<th style="text-align: right;">y_pred_prob_1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: right;">0.125706</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: right;">0.261988</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: right;">0.152732</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: right;">0.60142</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: right;">0.416483</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Our prediction model performed decent on test data, with a final overall accuracy of 0.75. In addition, looking through the prediction results dataframe, there are a total of 54 mistakes. Of which, 41 mistakes were predicting diabetic as non-diabetic (false negatives) and 13 mistakes were made predicting diabetic as non-diabetic (false positives). Considering implementation in clinic, there is room for improvement in the algorithm as false negatives are more harmful than false positives, and we should aim to lower false positives even further.</p>
+<p>Moreover, visualizing prediction probabilities alongside the prediction accuracy for each test sample provides a clearer understanding of the model’s performance. This approach allows us to easily assess how well the model predicts, while also highlighting patients who were misdiagnosed. Particularly, it helps us focus on false negatives, as the consequences of these errors are more critical in a clinical context.</p>
+<div id="fig-test_set_pred_accur" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-test_set_pred_accur-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/figures/predic_chart.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-test_set_pred_accur-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Test Set Prediction Accuracy by Prediction Probability.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+<p>While the performance of this model may be valuable as a screening tool in a clinical context, especially given its improvements over the baseline, there are several opportunities for further enhancement. One potential approach is to closely examine the 54 misclassified observations, comparing them with correctly classified examples from both classes. The objective would be to identify which features may be contributing to the misclassifications and investigate whether feature engineering could help the model improve its predictions on the observations it is currently struggling with. Additionally, we would try seeing whether we can get improved predictions using other classifiers. Other classifiers we might try are 1) random forest because it automatically allows for feature interaction, 2) k-nearest neighbours (k-NN) which usually provides easily interpretable and decent predictions, and 3) support vector classifier (SVC) as it allows for non-linear prediction using the rbf kernel. Finally, there runs the possibility that the features offered from this dataset alone are not sufficient to predict with high accuracy. In this case, conducting additional conversations with data collectors for additional useable information or explore additional datasets that can be joined so our set of features can be expanded for more complicated analysis might be beneficial.</p>
+<p>At last, we recognize the limitation with this dataset, as it focuses solely on Pima Indian women aged 21 and older, which limits its generalizability to other populations. To improve the analysis, it would be valuable to combine this data with other datasets representing different age groups, genders, and ethnicities, enabling more comprehensive insights and broader applicability of the findings.</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>In conclusion, this study demonstrated the effectiveness of logistic regression in predicting diabetes among Pima Indian women using diagnostic features such as glucose, BMI, and pregnancies. With an accuracy of 75% on the test set, the model outperformed the baseline Dummy Classifier’s 66%. Glucose was identified as the most influential predictor, followed by BMI and pregnancies, while features like blood pressure, insulin, and skin thickness had weaker impacts. However, the model’s 54 misclassifications, particularly the 41 false negatives, underscore the need for further refinement to minimize the risk of undiagnosed cases.</p>
+<p>These findings highlight logistic regression’s potential as an initial screening tool in clinical settings, offering a data-driven approach to early diabetes detection. Nevertheless, improvements are essential to enhance its accuracy and practical utility. Strategies such as feature engineering, alternative machine learning models, and the incorporation of additional data, such as lifestyle or genetic factors, could further optimize performance. Additionally, providing probability estimates for predictions could enhance clinical decision-making by identifying cases requiring further diagnostics. With these refinements, the model could become a valuable tool for reducing complications and improving outcomes in diabetes care.</p>
+</section>
+<section id="references" class="level1 unnumbered">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-agarwal2022machine" class="csl-entry" role="listitem">
+Agarwal, Neetu, and Ronak Vadiwala. 2022. <span>“Machine Learning and Data Mining Methods in Diabetes Research.”</span> <em>Asian Journal of Organic &amp; Medicinal Chemistry</em>.
+</div>
+<div id="ref-battineni2020applications" class="csl-entry" role="listitem">
+Battineni, Gopi, Getu Gamo Sagaro, Nalini Chinatalapudi, and Francesco Amenta. 2020. <span>“Applications of Machine Learning Predictive Models in the Chronic Disease Diagnosis.”</span> <em>Journal of Personalized Medicine</em> 10 (2): 21.
+</div>
+<div id="ref-bini2018artificial" class="csl-entry" role="listitem">
+Bini, Stefano A. 2018. <span>“Artificial Intelligence, Machine Learning, Deep Learning, and Cognitive Computing: What Do These Terms Mean and How Will They Impact Health Care?”</span> <em>The Journal of Arthroplasty</em> 33 (8): 2358–61.
+</div>
+<div id="ref-dua2017pima" class="csl-entry" role="listitem">
+Dua, Dheeru, and Casey Graff. 2017. <span>“Pima Indians Diabetes Database.”</span> <a href="https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database/data" class="uri">https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database/data</a>.
+</div>
+<div id="ref-harris2020array" class="csl-entry" role="listitem">
+Harris, Charles R, K Jarrod Millman, Stéfan J Van Der Walt, Ralf Gommers, Pauli Virtanen, David Cournapeau, Eric Wieser, et al. 2020. <span>“Array Programming with NumPy.”</span> <em>Nature</em> 585 (7825): 357–62.
+</div>
+<div id="ref-marshall2006prevention" class="csl-entry" role="listitem">
+Marshall, Sally M, and Allan Flyvbjerg. 2006. <span>“Prevention and Early Detection of Vascular Complications of Diabetes.”</span> <em>Bmj</em> 333 (7566): 475–80.
+</div>
+<div id="ref-pandas" class="csl-entry" role="listitem">
+McKinney, Wes. 2010. <span>“Data Structures for Statistical Computing in Python.”</span> In <em>Proceedings of the 9th Python in Science Conference</em>, edited by Stéfan van der Walt and Jarrod Millman, =51–56.
+</div>
+<div id="ref-ostblom2021altair" class="csl-entry" role="listitem">
+Ostblom, Joakim. 2021. <span>“Altair_ally: Enhancing Altair for Statistical Visualization.”</span> <a href="https://github.com/jostblom/altair_ally" class="uri">https://github.com/jostblom/altair_ally</a>.
+</div>
+<div id="ref-pedregosa2011scikit" class="csl-entry" role="listitem">
+Pedregosa, Fabian, Gaël Varoquaux, Alexandre Gramfort, Vincent Michel, Bertrand Thirion, Olivier Grisel, Mathieu Blondel, et al. 2011. <span>“Scikit-Learn: Machine Learning in Python.”</span> <em>The Journal of Machine Learning Research</em> 12: 2825–30.
+</div>
+<div id="ref-Python" class="csl-entry" role="listitem">
+Van Rossum, Guido, and Fred L. Drake. 2009. <em>Python 3 Reference Manual</em>. Scotts Valley, CA: CreateSpace.
+</div>
+<div id="ref-altair" class="csl-entry" role="listitem">
+VanderPlas, Jake. 2018. <span>“Altair: Interactive Statistical Visualizations for Python.”</span> <em>Journal of Open Source Software</em> 3 (7825, 32): 1057. <a href="https://doi.org/10.21105/joss.01057">https://doi.org/10.21105/joss.01057</a>.
+</div>
+<div id="ref-who_diabetes" class="csl-entry" role="listitem">
+World Health Organization. n.d. <span>“Diabetes.”</span> <a href="https://www.who.int/news-room/fact-sheets/detail/diabetes" class="uri">https://www.who.int/news-room/fact-sheets/detail/diabetes</a>.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

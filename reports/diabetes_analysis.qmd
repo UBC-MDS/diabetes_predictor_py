@@ -289,59 +289,6 @@ the lower range of pregnancies is dominated by the Non-Diabetic class, whereas w
 For `Blood Pressure` and `Skin Thickness`, both the Diabetic and Non-Diabetic classes approximates a normal distribution; 
 however, the Non-Diabetic distribution skews slightly towards lower values, while the Diabetic class skews more towards higher values.
 
-```{python}
-# validate training data for class imbalance for target variable 
-# Do these on training data as part of EDA! 
-train_df_ds = Dataset(train_df, label = 'Outcome', cat_features=[])
-
-check_lab_cls_imb = ClassImbalance().add_condition_class_ratio_less_than(0.4)
-check_lab_cls_imb_result = check_lab_cls_imb.run(dataset = train_df_ds)
-
-if check_lab_cls_imb_result.passed_conditions():
-    raise ValueError("Class imbalance exceeds the maximum acceptable threshold.")
-```
-
-```{python}
-# validate training data for percent of nulls
-check_pct_nulls = PercentOfNulls().add_condition_percent_of_nulls_not_greater_than(0.05)
-check_pct_nulls_result = check_pct_nulls.run(dataset = train_df_ds)
-
-if not check_pct_nulls_result.passed_conditions():
-    raise ValueError("Percent of nulls exceeds the maximum acceptable threshold for at least one column.")
-```
-
-```{python}
-# validate training data for percent of outlier samples using loOP algo
-check_out_sample = (
-    OutlierSampleDetection(nearest_neighbors_percent = 0.01, extent_parameter = 3)
-    .add_condition_outlier_ratio_less_or_equal(max_outliers_ratio = 0.001, outlier_score_threshold = 0.9)
-)
-check_out_sample_result = check_out_sample.run(dataset = train_df_ds)
-
-if not check_out_sample_result.passed_conditions():
-    raise ValueError("Number of outlier samples exceeds the maximum acceptable threshold.")
-```
-
-```{python}
-# validate training data for data duplicates
-# set duplicate condition to 0 as would not expect any two patient with the exact same situation
-check_data_dup = DataDuplicates().add_condition_ratio_less_or_equal(0)
-check_data_dup_result = check_data_dup.run(dataset = train_df_ds)
-
-if not check_data_dup_result.passed_conditions():
-    raise ValueError("Data duplicates exceed the maximum acceptable threshold.")
-```
-
-```{python}
-# validate training data for mixed data types across all columns
-check_mix_dtype = MixedDataTypes().add_condition_rare_type_ratio_not_in_range((0.01, 0.2))
-check_mix_dtype_result = check_mix_dtype.run(dataset = train_df_ds)
-
-if not check_mix_dtype_result.passed_conditions():
-    # raise a warning instead of an error in this case
-    warnings.warn("Percentage of rare data type in dangerous zone for at least one column")
-```
-
 ![Pearson and Spearman correlations across all features.](../results/figures/correlation_heat_map.png){#fig-correlation_heat_map width=80%}
 
 @fig-correlation_heat_map shows the correlation between all of the respective features. 
@@ -359,32 +306,7 @@ which is intuitive since higher body mass is generally associated with increased
 Referring back to the correlation graph, Skin Thickness and BMI have a Spearman correlation of `{python} f"{corr_skin_bmi:.00f}"`. 
 This value is below the multicollinearity threshold of 0.7, indicating that these features do not pose a risk of multicollinearity in our model.
 
-```{python}
-# validate training data for anomalous correlations between target/response variable 
-# and features/explanatory variables, 
-# as well as anomalous correlations between features/explanatory variables
-
-check_feat_lab_corr = FeatureLabelCorrelation().add_condition_feature_pps_less_than(0.7)
-check_feat_lab_corr_result = check_feat_lab_corr.run(dataset = train_df_ds)
-
-check_feat_feat_corr = FeatureFeatureCorrelation().add_condition_max_number_of_pairs_above_threshold(threshold = 0.7, n_pairs = 0)
-check_feat_feat_corr_result = check_feat_feat_corr.run(dataset = train_df_ds)
-
-if not check_feat_lab_corr_result.passed_conditions():
-    raise ValueError("Feature-Label correlation exceeds the maximum acceptable threshold.")
-
-if not check_feat_feat_corr_result.passed_conditions():
-    raise ValueError("Feature-feature correlation exceeds the maximum acceptable threshold.")
-```
-
 We then further split our dataset into X and y for both the training and test. 
-
-```{python}
-X_train = train_df.drop(columns = ['Outcome'])
-y_train = train_df['Outcome']
-X_test = test_df.drop(columns = ['Outcome'])
-y_test = test_df['Outcome']
-```
 
 As a result, the Dummy Classifier acts as our baseline for conducting our initial analysis. 
 The Dummy Baseline gives us a score of around `{python} round(mean_cv_score['mean_cv_score'].values[0], 2)`.
@@ -394,72 +316,6 @@ it is advisable to apply StandardScaler() to normalize the feature values before
 This ensures that all features are on a similar scale, improving the model's performance and stability.
 We optimize the hyperparameter `C` for our Logistic Regression model using a random search approach 
 and have identified C = `python {random_search.best_params_}` as the optimal C to be used in our Logistic Regression model.
-
-```{python}
-# Create Logistic Regression pipeline
-log_pipe=make_pipeline(
-    StandardScaler(), 
-    LogisticRegression(max_iter=2000,random_state=123)
-)
-```
-
-
-```{python}
-# Hyperparameter optimization
-np.random.seed(123)
-param_dist = {
-    "logisticregression__C": loguniform(1e-5, 1e+5) 
-}
-```
-
-```{python}
-# Create Random Search
-random_search = RandomizedSearchCV(log_pipe,param_dist,
-                                   n_iter=20,
-                                   n_jobs=-1,
-                                   return_train_score=True,
-                                   random_state=123)
-
-random_search.fit(X_train,y_train)
-```
-
-```{python}
-# Identify optiomized parameter C
-best_params = random_search.best_params_ 
-best_params
-```
-
-```{python}
-# Display scores
-pd.DataFrame(random_search.cv_results_).sort_values(
-    "rank_test_score").head(3)[["mean_test_score",
-                                "mean_train_score"]]
-```
-
-```{python}
-# Best model from the search
-best_model = random_search.best_estimator_
-
-# Retrieve the coefficients and feature names
-coefficients = best_model.named_steps['logisticregression'].coef_.flatten()
-features = X_train.columns  
-
-# Create a DataFrame to display the feature names and corresponding coefficients
-coeff_df = pd.DataFrame({
-    'Features': features,
-    'Coefficients': coefficients
-})
-
-# Sort by 'Coefficients' in descending order to see the most important features first
-coeff_df_sorted = coeff_df.sort_values(by = 'Coefficients', ascending = False)
-
-# Create a heatmap for the coefficients (we will visualize them as a single column)
-coeff_df_sorted.style.format(
-    precision = 3
-).background_gradient(
-    axis = None
-)
-```
 
 ```{python}
 #| label: tbl-coeff_table
@@ -481,13 +337,6 @@ along with the remaining positive features `BloodPressure` (`{python} round(coef
 and `Insulin` (`{python} round(coeff_table.iloc[coeff_table[coeff_table.iloc[:, 0] == 'Insulin'].index[0], 1], 2)`), 
 have weak impacts on the prediction, with their effects being less pronounced. 
 
-
-
-```{python}
-# Make predictions using the best model== "Glucose"]["Coefficient"].values[0]
-y_pred = best_model.predict(X_test)
-```
-
 We then evaluate the best Logistic Regression model, obtained from the hyperparameter search, on the test set. 
 In addition, to enhance the model's practical use in a clinical setting, 
 we are providing and reporting probability estimates for the predictions of diabetes. 
@@ -501,16 +350,6 @@ for the outcome (i.e. diagnosis of prediction) is not sufficiently high.
 #| echo: false 
 
 Markdown(pred_results_1_df.head().to_markdown(index = False))
-```
-
-```{python}
-y_pred_prob = best_model.predict_proba(X_test)
-pred_bool = (y_test == y_pred)
-pred_results_1 = np.vstack([y_test, y_pred, pred_bool, y_pred_prob[:, 1]])
-pred_results_1_df = pd.DataFrame(pred_results_1.T, 
-                                 columns = ['y_test', 'y_pred', 'pred_bool', 'y_pred_prob_1'])
-pred_results_1_df['pred_bool'] = pred_results_1_df['pred_bool'] == 1
-pred_results_1_df.head()
 ```
 
 Our prediction model performed decent on test data, with a final overall accuracy of `{python} accuracy_df['accuracy'].values[0]`. 
