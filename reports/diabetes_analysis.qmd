@@ -164,63 +164,6 @@ df_original
 ```
 
 ```{python}
-
-# Configure logging
-logging.basicConfig(
-    filename="validation_errors.log",
-    filemode="w",
-    format="%(asctime)s - %(message)s",
-    level=logging.INFO,
-)
-
-# Define schema
-schema = pa.DataFrameSchema(
-    { 
-        "Outcome": pa.Column(int, pa.Check.isin([0, 1])),
-        "Pregnancies": pa.Column(int, pa.Check.between(0, 15), nullable=True),
-        "Glucose": pa.Column(int, pa.Check.between(50, 240), nullable=True),
-        "BloodPressure": pa.Column(int, pa.Check.between(40, 180), nullable=True),
-        "SkinThickness": pa.Column(int, pa.Check.between(0, 80), nullable=True),
-        "Insulin": pa.Column(int, pa.Check.between(0, 800), nullable=True),
-        "BMI": pa.Column(float, pa.Check.between(0, 65), nullable=True),
-        "DiabetesPedigreeFunction": pa.Column(float, pa.Check.between(0, 2.5), nullable=True),
-        "Age": pa.Column(int, pa.Check.between(18, 90), nullable=True),
-    },
-    checks=[
-        pa.Check(lambda df: ~df.duplicated().any(), error="Duplicate rows found."),
-        pa.Check(lambda df: ~(df.isna().all(axis=1)).any(), error="Empty rows found.")
-    ],
-    drop_invalid_rows=False,  # Ensure this is properly closed
-)
-
-# Initialize error cases DataFrame
-error_cases = pd.DataFrame()
-data = df_original.copy()
-
-# Validate data and handle errors
-try:
-    validated_data = schema.validate(data, lazy=True)
-except pa.errors.SchemaErrors as e:
-    error_cases = e.failure_cases
-
-    # Convert the error message to a JSON string
-    error_message = json.dumps(e.message, indent=2)
-    logging.error("\n" + error_message)
-
-# Filter out invalid rows based on the error cases
-if not error_cases.empty:
-    invalid_indices = error_cases["index"].dropna().unique()
-    df = (
-        data.drop(index=invalid_indices)
-        .reset_index(drop=True)
-        .drop_duplicates()
-        .dropna(how="all")
-    )
-else:
-    df = data
-```
-
-```{python}
 df
 
 df.to_csv('../data/processed/df.csv')

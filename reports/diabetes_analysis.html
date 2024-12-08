@@ -136,8 +136,8 @@ div.csl-indent {
 <section id="analysis" class="level3">
 <h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
 <p>Logistic Regression was employed to develop a classification model for predicting whether the patient is diabetic or not (as indicated in the <code>outcome</code> column of the dataset). All variables from the original dataset were used to train the model. The data was split into 70% for the training set and 30% for the testing set. Hyperparameter tuning was performed using <code>RandomizedSearchCV</code>, with the accuracy score serving as the classification metric. All variables were standardized just before model fitting. The analysis was conducted using the Python programming language <span class="citation" data-cites="Python">(<a href="#ref-Python" role="doc-biblioref">Van Rossum and Drake 2009</a>)</span> and several Python packages: numpy <span class="citation" data-cites="harris2020array">(<a href="#ref-harris2020array" role="doc-biblioref">Harris et al. 2020</a>)</span>, Pandas <span class="citation" data-cites="pandas">(<a href="#ref-pandas" role="doc-biblioref">McKinney 2010</a>)</span>, altair <span class="citation" data-cites="altair">(<a href="#ref-altair" role="doc-biblioref">VanderPlas 2018</a>)</span>, altair_ally <span class="citation" data-cites="ostblom2021altair">(<a href="#ref-ostblom2021altair" role="doc-biblioref">Ostblom 2021</a>)</span> and scikit-learn <span class="citation" data-cites="pedregosa2011scikit">(<a href="#ref-pedregosa2011scikit" role="doc-biblioref">Pedregosa et al. 2011</a>)</span>. The code used for this analysis and report is available at: https://github.com/UBC-MDS/diabetes_predictor_py</p>
-<div id="52e6496e" class="cell" data-execution_count="3">
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div id="97ace2f7" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="33">
 <div>
 
 
@@ -296,35 +296,36 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<div id="9b7e56cd" class="cell" data-execution_count="6">
+<div id="240db646" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-stdout">
 <pre><code>(768, 9)
-(719, 9)</code></pre>
+(719, 10)</code></pre>
 </div>
 </div>
 <p>We do see 49 observations being dropped post our preliminary data validation as the rows dropped contain meaningless and / or invalid data entries that would unlikely provide useful information but instead introduce noise or spurious relationships into our model. Details of the observations dropped can be found at https://github.com/UBC-MDS/diabetes_predictor_py under <code>validation_errors.log</code>. It is clearly shown from the log that majority of data points that are dropped contained values of 0 where levels cannot possibly be, hence, we suspect that the values recorded at 0 are likely missing values recorded in such way, a critical point we will confirm with data collectors if we have access.</p>
-<div id="60432c00" class="cell" data-execution_count="7">
+<div id="228472f9" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
 RangeIndex: 719 entries, 0 to 718
-Data columns (total 9 columns):
+Data columns (total 10 columns):
  #   Column                    Non-Null Count  Dtype  
 ---  ------                    --------------  -----  
- 0   Pregnancies               719 non-null    int64  
- 1   Glucose                   719 non-null    int64  
- 2   BloodPressure             719 non-null    int64  
- 3   SkinThickness             719 non-null    int64  
- 4   Insulin                   719 non-null    int64  
- 5   BMI                       719 non-null    float64
- 6   DiabetesPedigreeFunction  719 non-null    float64
- 7   Age                       719 non-null    int64  
- 8   Outcome                   719 non-null    int64  
-dtypes: float64(2), int64(7)
-memory usage: 50.7 KB</code></pre>
+ 0   Unnamed: 0                719 non-null    int64  
+ 1   Pregnancies               719 non-null    int64  
+ 2   Glucose                   719 non-null    int64  
+ 3   BloodPressure             719 non-null    int64  
+ 4   SkinThickness             719 non-null    int64  
+ 5   Insulin                   719 non-null    int64  
+ 6   BMI                       719 non-null    float64
+ 7   DiabetesPedigreeFunction  719 non-null    float64
+ 8   Age                       719 non-null    int64  
+ 9   Outcome                   719 non-null    int64  
+dtypes: float64(2), int64(8)
+memory usage: 56.3 KB</code></pre>
 </div>
 </div>
-<div id="d1ba27cb" class="cell" data-execution_count="9">
-<div class="cell-output cell-output-display" data-execution_count="27">
+<div id="982789db" class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="38">
 <div>
 
 
@@ -332,6 +333,7 @@ memory usage: 50.7 KB</code></pre>
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Unnamed: 0</th>
 <th data-quarto-table-cell-role="th">Pregnancies</th>
 <th data-quarto-table-cell-role="th">Glucose</th>
 <th data-quarto-table-cell-role="th">BloodPressure</th>
@@ -355,9 +357,11 @@ memory usage: 50.7 KB</code></pre>
 <td>503.000000</td>
 <td>503.000000</td>
 <td>503.000000</td>
+<td>503.000000</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">mean</td>
+<td>359.001988</td>
 <td>3.813121</td>
 <td>121.524851</td>
 <td>73.025845</td>
@@ -370,6 +374,7 @@ memory usage: 50.7 KB</code></pre>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">std</td>
+<td>206.183084</td>
 <td>3.360905</td>
 <td>30.469809</td>
 <td>12.250267</td>
@@ -383,6 +388,7 @@ memory usage: 50.7 KB</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">min</td>
 <td>0.000000</td>
+<td>0.000000</td>
 <td>56.000000</td>
 <td>40.000000</td>
 <td>0.000000</td>
@@ -394,6 +400,7 @@ memory usage: 50.7 KB</code></pre>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">25%</td>
+<td>179.500000</td>
 <td>1.000000</td>
 <td>99.500000</td>
 <td>64.000000</td>
@@ -406,6 +413,7 @@ memory usage: 50.7 KB</code></pre>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">50%</td>
+<td>371.000000</td>
 <td>3.000000</td>
 <td>117.000000</td>
 <td>72.000000</td>
@@ -418,6 +426,7 @@ memory usage: 50.7 KB</code></pre>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">75%</td>
+<td>531.500000</td>
 <td>6.000000</td>
 <td>139.000000</td>
 <td>80.000000</td>
@@ -430,6 +439,7 @@ memory usage: 50.7 KB</code></pre>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">max</td>
+<td>717.000000</td>
 <td>14.000000</td>
 <td>199.000000</td>
 <td>122.000000</td>
@@ -446,9 +456,10 @@ memory usage: 50.7 KB</code></pre>
 </div>
 </div>
 </div>
-<div id="1573a125" class="cell" data-execution_count="10">
-<div class="cell-output cell-output-display" data-execution_count="28">
-<pre><code>['Pregnancies',
+<div id="d5800a26" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="39">
+<pre><code>['Unnamed: 0',
+ 'Pregnancies',
  'Glucose',
  'BloodPressure',
  'SkinThickness',
@@ -501,14 +512,14 @@ Figure&nbsp;3: Pairwise scatterplots between each of features in dataset to visu
 <p>We then further split our dataset into X and y for both the training and test.</p>
 <p>As a result, the Dummy Classifier acts as our baseline for conducting our initial analysis. The Dummy Baseline gives us a score of around 0.66.</p>
 <p>We will use a Logistic Regression model for classification. Given the presence of outliers in our features, it is advisable to apply StandardScaler() to normalize the feature values before fitting the model. This ensures that all features are on a similar scale, improving the model’s performance and stability. We optimize the hyperparameter <code>C</code> for our Logistic Regression model using a random search approach and have identified C = <code>python {random_search.best_params_}</code> as the optimal C to be used in our Logistic Regression model.</p>
-<div class="cell" data-execution_count="11">
-<div id="tbl-coeff_table" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="11">
+<div class="cell" data-execution_count="10">
+<div id="tbl-coeff_table" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="10">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-coeff_table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;1: Logistic regression feature importance measured by coefficients.
 </figcaption>
 <div aria-describedby="tbl-coeff_table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="29">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="40">
 <table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
@@ -558,8 +569,8 @@ Table&nbsp;1: Logistic regression feature importance measured by coefficients.
 </div>
 <p>Having determined the best Logistic Regression model for our analysis, we further explore feature importance with coefficients. Based on the heatmap and <a href="#tbl-coeff_table" class="quarto-xref">Table&nbsp;1</a> above, the feature importance coefficients for the logistic regression model predicting diabetes reveal that <code>Glucose</code> (0.72) is the strongest positive influence, followed by <code>BMI</code> (0.39), <code>Pregnancies</code> (0.23), <code>Age</code> (0.19), and <code>DiabetesPedigreeFunction</code> (0.16). The negative influence <code>SkinThickness</code> (-0.01) along with the remaining positive features <code>BloodPressure</code> (0.05) and <code>Insulin</code> (0.0), have weak impacts on the prediction, with their effects being less pronounced.</p>
 <p>We then evaluate the best Logistic Regression model, obtained from the hyperparameter search, on the test set. In addition, to enhance the model’s practical use in a clinical setting, we are providing and reporting probability estimates for the predictions of diabetes. Offering probability estimates would allow clinicians to gauge the model’s confidence in its predictions. This would give clinicians the opportunity to conduct additional diagnostic tests if the predicted probability for the outcome (i.e.&nbsp;diagnosis of prediction) is not sufficiently high.</p>
-<div class="cell" data-execution_count="12">
-<div id="pred_results_1_table" class="cell-output cell-output-display cell-output-markdown" data-execution_count="30">
+<div class="cell" data-execution_count="11">
+<div id="pred_results_1_table" class="cell-output cell-output-display cell-output-markdown" data-execution_count="41">
 <table class="caption-top table table-sm table-striped small">
 <caption>Prediction Results with Probability Estimates for Diabetes Classification. {#cell-pred_results_1_table}</caption>
 <thead>
