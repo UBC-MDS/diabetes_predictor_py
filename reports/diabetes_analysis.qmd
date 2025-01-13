@@ -146,7 +146,7 @@ The data was split into a 70% training set and a 30% testing set.
 
 Hyperparameter tuning was performed using `RandomizedSearchCV`, and the accuracy score was used as the evaluation metric for model performance. 
 The hyperparameter C of the Logistic Regression model, which controls the trade-off between model complexity and training data fitting, 
-was optimized using a log-uniform distribution ranging from \(1 \times 10^{-5}\) and \(1 \times 10^{5}\). 
+was optimized using a log-uniform distribution ranging from $1 \times 10^{-5}$ and $1 \times 10^{5}$. 
 The range and log-uniform distribution was chosen to efficiently explore a wide range of values, balancing model complexity and fitting. 
 This approach ensures the model is not overly regularized or overfitted, promoting better generalization to unseen data.
 
@@ -212,7 +212,7 @@ as the optimal C to be used in our Logistic Regression model.
 #| label: tbl-coeff_table
 #| tbl-cap: Logistic regression feature importance measured by coefficients.
 #| echo: false
-Markdown(coeff_table.to_markdown())
+Markdown(coeff_table.to_markdown(index=False))
 ```
 
 Having determined the best Logistic Regression model for our analysis, we further explore feature importance with coefficients. 

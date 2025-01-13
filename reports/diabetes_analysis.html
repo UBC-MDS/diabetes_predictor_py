@@ -56,6 +56,35 @@ div.csl-indent {
 <link href="diabetes_analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="diabetes_analysis_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -137,7 +166,7 @@ div.csl-indent {
 <section id="analysis" class="level2">
 <h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
 <p>In this study, Logistic Regression was employed to develop a classification model for predicting whether a patient has diabetes. The model was trained using all features in the dataset, with the outcome column serving as the target variable. The data was split into a 70% training set and a 30% testing set.</p>
-<p>Hyperparameter tuning was performed using <code>RandomizedSearchCV</code>, and the accuracy score was used as the evaluation metric for model performance. The hyperparameter C of the Logistic Regression model, which controls the trade-off between model complexity and training data fitting, was optimized using a log-uniform distribution ranging from (1 ^{-5}) and (1 ^{5}). The range and log-uniform distribution was chosen to efficiently explore a wide range of values, balancing model complexity and fitting. This approach ensures the model is not overly regularized or overfitted, promoting better generalization to unseen data.</p>
+<p>Hyperparameter tuning was performed using <code>RandomizedSearchCV</code>, and the accuracy score was used as the evaluation metric for model performance. The hyperparameter C of the Logistic Regression model, which controls the trade-off between model complexity and training data fitting, was optimized using a log-uniform distribution ranging from <span class="math inline">\(1 \times 10^{-5}\)</span> and <span class="math inline">\(1 \times 10^{5}\)</span>. The range and log-uniform distribution was chosen to efficiently explore a wide range of values, balancing model complexity and fitting. This approach ensures the model is not overly regularized or overfitted, promoting better generalization to unseen data.</p>
 <p>Standardization was applied to all input variables just before model fitting to ensure that the features were on the same scale. This process was done to improve model performance and to help prevent any single feature from dominating the others. The analysis was conducted using the Python programming language <span class="citation" data-cites="Python">(<a href="#ref-Python" role="doc-biblioref">Van Rossum and Drake 2009</a>)</span> and several Python packages: numpy <span class="citation" data-cites="harris2020array">(<a href="#ref-harris2020array" role="doc-biblioref">Harris et al. 2020</a>)</span>, Pandas <span class="citation" data-cites="pandas">(<a href="#ref-pandas" role="doc-biblioref">McKinney 2010</a>)</span>, altair <span class="citation" data-cites="altair">(<a href="#ref-altair" role="doc-biblioref">VanderPlas 2018</a>)</span>, altair_ally <span class="citation" data-cites="ostblom2021altair">(<a href="#ref-ostblom2021altair" role="doc-biblioref">Ostblom 2021</a>)</span> and scikit-learn <span class="citation" data-cites="pedregosa2011scikit">(<a href="#ref-pedregosa2011scikit" role="doc-biblioref">Pedregosa et al. 2011</a>)</span>. The code used for this analysis and report is available at: https://github.com/UBC-MDS/diabetes_predictor_py</p>
 </section>
 </section>
@@ -190,53 +219,44 @@ Figure&nbsp;3: Pairwise scatterplots between each of features in dataset to visu
 Table&nbsp;1: Logistic regression feature importance measured by coefficients.
 </figcaption>
 <div aria-describedby="tbl-coeff_table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="24">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="4">
 <table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: right;"></th>
 <th style="text-align: left;">Features</th>
 <th style="text-align: right;">Coefficients</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0</td>
 <td style="text-align: left;">Glucose</td>
 <td style="text-align: right;">0.724</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1</td>
 <td style="text-align: left;">BMI</td>
 <td style="text-align: right;">0.389</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">2</td>
 <td style="text-align: left;">Pregnancies</td>
 <td style="text-align: right;">0.229</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">3</td>
 <td style="text-align: left;">Age</td>
 <td style="text-align: right;">0.194</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">4</td>
 <td style="text-align: left;">DiabetesPedigreeFunction</td>
 <td style="text-align: right;">0.161</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">5</td>
 <td style="text-align: left;">BloodPressure</td>
 <td style="text-align: right;">0.048</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">6</td>
 <td style="text-align: left;">SkinThickness</td>
 <td style="text-align: right;">-0.007</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">7</td>
 <td style="text-align: left;">Insulin</td>
 <td style="text-align: right;">0.002</td>
 </tr>
